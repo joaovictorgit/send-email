@@ -13,4 +13,18 @@ routes.post(
   }
 );
 
+routes.post(
+  "/message",
+  (request: Request, response: Response, next: NextFunction) => {
+    return emailController.createMessage(request, response);
+  }
+);
+
+routes.post(
+  "/send",
+  (request: Request, response: Response, next: NextFunction) => {
+    return emailController.sendMessage(response);
+  }
+);
+
 export default routes;
