@@ -2,8 +2,9 @@ import { IMessage } from "../entities/message";
 import { IEmail } from "../entities/email";
 import { checkIfEmailExist } from "../middleware/check";
 import { Request, Response } from "express";
-import { transport } from "../middleware/nodemailer";
 
+const nodemailer = require("nodemailer");
+const SMTP_CONFIG = require("../config/smtp");
 const listEmails: Array<IEmail> = new Array<IEmail>();
 const message: IMessage = { title: "", message: "" };
 
@@ -66,31 +67,37 @@ class EmailController {
         result: false,
       });
     }
-    const mailOptions = {
-      from: "no-reply@joaovictor.com",
-      to: "",
-      subject: "",
-      text: "",
-    };
-    for (var email in this.listEmails) {
-      mailOptions.to = email;
-      mailOptions.subject = this.message.title;
-      mailOptions.text = this.message.message;
-      transport.sendMail(mailOptions, (error: unknown, info: any) => {
-        if (error) {
-          return response.status(400).json({
-            message: error,
-            result: false,
-          });
-        } else {
-          console.log("Email enviado: " + info.response);
-        }
-      });
-    }
-    return response.status(200).json({
-      message: "Send emails!",
-      result: true,
+    const transport = nodemailer.createTransport({
+      host: SMTP_CONFIG.host,
+      port: SMTP_CONFIG.port,
+      secure: true,
+      auth: {
+        user: SMTP_CONFIG.user,
+        pass: SMTP_CONFIG.pass,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
+
+    const mailSent = await transport.sendMail(
+      {
+        text: this.message.message,
+        subject: this.message.title,
+        from: "João Victor <almeida.dev0216@gmail.com",
+        to: this.listEmails,
+      },
+      function (error: unknown, info: any) {
+        if (error) {
+          console.log(error);
+        } else {
+          return response.status(200).json({
+            message: "Send emails!",
+            result: true,
+          });
+        }
+      }
+    );
   }
 }
 
