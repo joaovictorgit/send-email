@@ -35,6 +35,10 @@ class EmailController {
     }
   }
 
+  async getEmails(request: Request, response: Response): Promise<Response>{
+    return response.status(200).json(this.listEmails);
+  }
+
   async createMessage(request: Request, response: Response): Promise<Response> {
     const { title, message } = request.body;
     if (!title || !message) {

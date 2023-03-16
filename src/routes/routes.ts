@@ -13,6 +13,13 @@ routes.post(
   }
 );
 
+routes.get(
+  "/email",
+  (request: Request, response: Response, next: NextFunction) => {
+    return emailController.getEmails(request, response);
+  }
+);
+
 routes.post(
   "/message",
   (request: Request, response: Response, next: NextFunction) => {
